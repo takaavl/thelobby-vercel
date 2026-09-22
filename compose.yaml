@@ -1,0 +1,15 @@
+services:
+  the-lobby:
+    build: .
+    ports:
+      - "8765:8765"
+    env_file:
+      - .env
+    volumes:
+      - lobby-data:/data
+    environment:
+      THE_LOBBY_DB: /data/inhouse.db
+      THE_LOBBY_RAW: /data/raw
+
+volumes:
+  lobby-data:

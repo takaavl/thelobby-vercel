@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Compile
+        run: python -m py_compile server.py src/*.py
+      - name: Empty database smoke test
+        run: |
+          python - <<'PY'
+          import server
+          from src.db import connect
+          c=connect(server.DB)
+          assert c.execute("SELECT COUNT(*) FROM matches").fetchone()[0] == 0
+          assert "The Lobby" in server.home()
+          assert "MATCH ARCHIVE" in server.matches_page()
+          assert "Players" in server.players()
+          print("The Lobby smoke test OK")
+          PY

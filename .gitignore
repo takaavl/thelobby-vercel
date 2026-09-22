@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.DS_Store
+
+# Runtime data: never commit match history or raw Tracker payloads
+inhouse.db
+inhouse.db-*
+data/raw/*.json
+!data/raw/.gitkeep
+
+# Local logs / temp
+*.log
+tmp/
+
+# Vercel local metadata
+.vercel/
