@@ -168,7 +168,7 @@ def leaderboard(db):
     c.close(); return rows
 
 
-PLAYSTYLE_MIN_GAMES = 3
+PLAYSTYLE_MIN_GAMES = 5
 UNDERUSED_WEAPONS = ("Frenzy","Bulldog","Ares","Guardian")
 
 def _q(values, q):
@@ -541,7 +541,7 @@ def playstyle_tags(db, riot, min_games=PLAYSTYLE_MIN_GAMES):
 
     c=connect(db)
 
-    # Clutch tags: specific sample minimum, independent from overall 3-game gate.
+    # Clutch tags: specific sample minimum, independent from overall 5-game gate.
     cr=c.execute("""SELECT SUM(clutches) w,SUM(clutches_lost) l FROM player_matches WHERE riot_id=?""",(riot,)).fetchone()
     cw,cl=(cr["w"] or 0),(cr["l"] or 0); attempts=cw+cl
     if attempts>=3:

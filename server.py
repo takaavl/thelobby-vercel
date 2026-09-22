@@ -346,7 +346,7 @@ def home():
       <div class=welcome-actions><a class=discord-cta href="{esc(DISCORD_INVITE)}" target="_blank" rel="noopener">REJOINDRE LE DISCORD ↗</a><a class=secondary-cta href="/players">VOIR LES JOUEURS</a></div></div>
       <div class=welcome-stats><div><b>{pc}</b><span>joueurs</span></div><div><b>{rounds}</b><span>rounds joués</span></div><div><b>{kills}</b><span>kills enregistrés</span></div></div>
       </section>
-      <section class=project-note><div class=eyebrow>THE PROJECT</div><p>The Lobby est notre espace privé d’inhouses Valorant : jouer sérieusement sans pression de RR, progresser en équipe, tester des rôles, créer des rivalités et garder une trace de toutes nos games.</p><div class=project-chips><span>10 joueurs</span><span>équipes équilibrées</span><span>BO1</span><span>stats all-time</span></div></section>
+      <section class=project-note><div class=eyebrow>THE PROJECT</div><p>The Lobby est notre espace privé d’inhouses Valorant : jouer sérieusement sans pression de RR, progresser en équipe, tester des rôles, créer des rivalités et garder une trace de toutes nos games.</p><div class=project-chips><span>10 joueurs</span><span>équipes aléatoires</span><span>BO1</span><span>stats all-time</span></div></section>
       <div class=home-section-head><div><div class=eyebrow>RECENT</div><h2>Derniers matchs</h2></div><a href="/matches">VOIR TOUS LES MATCHS →</a></div>
       <section class=match-card-grid>{cards}</section>""")
 
@@ -386,7 +386,7 @@ def player(rid,advanced=False):
     alias_rows=con.execute("SELECT alias_riot_id FROM player_aliases WHERE canonical_riot_id=? ORDER BY created_at,alias_riot_id",(rid,)).fetchall()
     alias_html=('<div class=aliases><span>aliases:</span> '+", ".join(esc(x["alias_riot_id"]) for x in alias_rows)+'</div>') if alias_rows else ""
     head=f"""<section class=hero><div class=profile-head>{avatar}<div><div class=eyebrow>PLAYER PROFILE</div><h1>{esc(prof['display_name'])}</h1>{alias_html}<div class=muted>{games} inhouses · {wr:.1f}% winrate · {rounds} rounds</div></div></div>
-    <div class=stats><div class=stat>ACS<b>{acs:.0f}</b></div><div class=stat>K:D<b>{kd:.2f}</b></div><div class=stat>KAST<b>{kast:.1f}%</b></div><div class=stat>ADR<b>{adr:.1f}</b></div><div class=stat>HS%<b>{hs:.0f}%</b></div><div class=stat>FK:FD<b>{fkfd:.2f}</b></div><div class=stat>Winrate<b>{wr:.0f}%</b></div></div>
+    <div class=stats><div class=stat>ACS<b>{acs:.0f}</b></div><div class=stat>K:D<b>{kd:.2f}</b></div><div class=stat>KAST<b>{kast:.1f}%</b></div><div class=stat>HS%<b>{hs:.0f}%</b></div><div class=stat>FK:FD<b>{fkfd:.2f}</b></div><div class=stat>Winrate<b>{wr:.0f}%</b></div></div>
     <div class=tabs><a class="{'active' if not advanced else ''}" href="{player_url(rid)}">Overview</a><a class="{'active' if advanced else ''}" href="/advanced?riot={quote(rid,safe='')}">Advanced stats</a></div></section>"""
     if advanced:
         attack_kd=ratio(o["ak"],o["ad"]); defense_kd=ratio(o["dk"],o["dd"])
@@ -539,7 +539,7 @@ def player_v3_blocks(rid):
     tags_html=""
     if tags:
         pills="".join('<div class="insight-tag %s" tabindex="0"><b>%s</b><div class=insight-tooltip>%s</div></div>'%(t["tone"],esc(t["name"]),esc(t["description"])) for t in tags)
-        tags_html='<section class="panel insight-panel"><div class=section-title>Playstyle insights <span class=prototype-badge>3+ games</span></div><div class=insight-grid>%s</div></section>'%pills
+        tags_html='<section class="panel insight-panel"><div class=section-title>Playstyle insights <span class=prototype-badge>5+ games</span></div><div class=insight-grid>%s</div></section>'%pills
 
     return strip+tags_html+mh+'<div class=grid2>'+h2h+maphtml+'</div>'+mateshtml
 
@@ -655,29 +655,6 @@ def route_match(id: str="", tab: str="overview"):
     except Exception:
         traceback.print_exc(); return page(layout("Erreur","<section class=hero><h1>Erreur serveur</h1></section>"),500)
 
-
-
-@app.get("/admin/debug-advanced")
-def route_admin_debug_advanced(request: Request, riot: str=""):
-    """Temporary protected diagnostic endpoint for the Advanced page."""
-    if not is_admin(request):
-        return admin_denied()
-    try:
-        if not riot:
-            c=connect(DB)
-            row=c.execute("SELECT riot_id FROM player_profiles ORDER BY riot_id LIMIT 1").fetchone()
-            c.close()
-            if not row:
-                return PlainTextResponse("No player found.",status_code=404)
-            riot=row["riot_id"]
-        # Re-run the exact Advanced renderer and return a compact success marker.
-        rendered=player(riot,True)
-        return PlainTextResponse(f"ADVANCED OK for {riot} · {len(rendered)} chars")
-    except Exception:
-        return PlainTextResponse(
-            "ADVANCED DEBUG ERROR\n\n"+traceback.format_exc(),
-            status_code=500
-        )
 
 
 @app.get("/admin/import")
