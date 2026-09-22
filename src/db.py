@@ -124,7 +124,13 @@ class CompatCursor:
 
     def __iter__(self):
         columns = self._columns()
-        for row in self._cursor:
+        # The Turso/libSQL cursor implements fetchone()/fetchall() but is not
+        # itself iterable like sqlite3.Cursor. Iterate explicitly for DB-API
+        # compatibility with existing analytics code.
+        while True:
+            row = self._cursor.fetchone()
+            if row is None:
+                break
             if isinstance(row, sqlite3.Row):
                 yield row
             else:
