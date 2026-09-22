@@ -189,10 +189,13 @@ def connect(path=None):
 def init(path=None):
     con = connect(path)
     try:
-        # Avoid replaying the full schema over the network on every Vercel cold start.
+        # Avoid replaying the full schema on every Vercel cold start, while still
+        # allowing schema migrations when a newer release adds a table.
         if using_turso():
             try:
-                ready = con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='raw_matches'").fetchone()
+                ready = con.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='import_status'"
+                ).fetchone()
                 if ready:
                     return
             except Exception:
