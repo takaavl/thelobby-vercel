@@ -656,6 +656,30 @@ def route_match(id: str="", tab: str="overview"):
         traceback.print_exc(); return page(layout("Erreur","<section class=hero><h1>Erreur serveur</h1></section>"),500)
 
 
+
+@app.get("/admin/debug-advanced")
+def route_admin_debug_advanced(request: Request, riot: str=""):
+    """Temporary protected diagnostic endpoint for the Advanced page."""
+    if not is_admin(request):
+        return admin_denied()
+    try:
+        if not riot:
+            c=connect(DB)
+            row=c.execute("SELECT riot_id FROM player_profiles ORDER BY riot_id LIMIT 1").fetchone()
+            c.close()
+            if not row:
+                return PlainTextResponse("No player found.",status_code=404)
+            riot=row["riot_id"]
+        # Re-run the exact Advanced renderer and return a compact success marker.
+        rendered=player(riot,True)
+        return PlainTextResponse(f"ADVANCED OK for {riot} · {len(rendered)} chars")
+    except Exception:
+        return PlainTextResponse(
+            "ADVANCED DEBUG ERROR\n\n"+traceback.format_exc(),
+            status_code=500
+        )
+
+
 @app.get("/admin/import")
 def route_admin_import(request: Request, msg: str=""):
     if not is_admin(request): return admin_denied()

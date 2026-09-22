@@ -105,3 +105,8 @@ They use HTTP Basic Auth and remain locked when admin credentials are not config
 ## Serverless import performance
 
 Remote Turso imports are batched into multi-row SQL statements to avoid thousands of network round trips. Interrupted imports are marked and safely retried on the next upload of the same Match ID.
+
+
+### Temporary diagnostic route
+
+`/admin/debug-advanced` is protected by the same Basic Auth as the import page and returns the full Advanced traceback only to an authenticated admin. Remove it after the Turso Advanced issue is fixed.
