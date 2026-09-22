@@ -100,3 +100,8 @@ They use HTTP Basic Auth and remain locked when admin credentials are not config
 ## Health check
 
 `/health` returns `ok` when the application is running.
+
+
+## Serverless import performance
+
+Remote Turso imports are batched into multi-row SQL statements to avoid thousands of network round trips. Interrupted imports are marked and safely retried on the next upload of the same Match ID.

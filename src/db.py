@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS matches (
 CREATE TABLE IF NOT EXISTS raw_matches (
  match_id TEXT PRIMARY KEY, payload_json TEXT NOT NULL, stored_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS import_status (
+ match_id TEXT PRIMARY KEY, status TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TABLE IF NOT EXISTS teams (
  match_id TEXT, team_id TEXT, won INTEGER, rounds_won INTEGER, rounds_lost INTEGER,
  kills INTEGER, deaths INTEGER, assists INTEGER, damage INTEGER,
