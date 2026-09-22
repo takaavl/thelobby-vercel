@@ -19,7 +19,7 @@ HOST=os.getenv("HOST","0.0.0.0")
 PORT=int(os.getenv("PORT") or "8765")
 ADMIN_USER=os.getenv("ADMIN_USER","")
 ADMIN_PASSWORD=os.getenv("ADMIN_PASSWORD","")
-MAX_IMPORT_BYTES=int(os.getenv("MAX_IMPORT_BYTES",str(15*1024*1024)))
+MAX_IMPORT_BYTES=int(os.getenv("MAX_IMPORT_BYTES") or str(15*1024*1024))
 
 DB.parent.mkdir(parents=True,exist_ok=True)
 if not os.getenv("TURSO_DATABASE_URL"):
